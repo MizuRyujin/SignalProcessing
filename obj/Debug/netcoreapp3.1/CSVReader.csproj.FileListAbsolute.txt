@@ -1,0 +1,11 @@
+D:\Miguel\Documents\Projetos\CSVReader\bin\Debug\netcoreapp3.1\CSVReader.exe
+D:\Miguel\Documents\Projetos\CSVReader\bin\Debug\netcoreapp3.1\CSVReader.deps.json
+D:\Miguel\Documents\Projetos\CSVReader\bin\Debug\netcoreapp3.1\CSVReader.runtimeconfig.json
+D:\Miguel\Documents\Projetos\CSVReader\bin\Debug\netcoreapp3.1\CSVReader.runtimeconfig.dev.json
+D:\Miguel\Documents\Projetos\CSVReader\bin\Debug\netcoreapp3.1\CSVReader.dll
+D:\Miguel\Documents\Projetos\CSVReader\bin\Debug\netcoreapp3.1\CSVReader.pdb
+D:\Miguel\Documents\Projetos\CSVReader\obj\Debug\netcoreapp3.1\CSVReader.csprojAssemblyReference.cache
+D:\Miguel\Documents\Projetos\CSVReader\obj\Debug\netcoreapp3.1\CSVReader.AssemblyInfoInputs.cache
+D:\Miguel\Documents\Projetos\CSVReader\obj\Debug\netcoreapp3.1\CSVReader.AssemblyInfo.cs
+D:\Miguel\Documents\Projetos\CSVReader\obj\Debug\netcoreapp3.1\CSVReader.dll
+D:\Miguel\Documents\Projetos\CSVReader\obj\Debug\netcoreapp3.1\CSVReader.pdb
