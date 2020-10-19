@@ -62,20 +62,30 @@ namespace CSVReader
             int halfWindow = windowSize / 2;
 
             int index = 0;
-            Queue<float> before = new Queue<float>(Enumerable.Repeat(float.NegativeInfinity, halfWindow));
-            Queue<float> after = new Queue<float>(source.Take(halfWindow + 1));
+            //* where last compared value is gonna go
+            Queue<float> lastComparedValue = new Queue<float>(Enumerable.Repeat(float.NegativeInfinity, halfWindow));
 
+            //* Left half of the window
+            Queue<float> leftHalf = new Queue<float>(source.Take(halfWindow + 1));
+
+            //* goes through collection from half point + 1 
             foreach (float d in source.Skip(halfWindow + 1).Concat(Enumerable.Repeat(float.NegativeInfinity, halfWindow + 1)))
             {
-                float curVal = after.Dequeue();
-                if (before.All(x => curVal > x) && after.All(x => curVal >= x))
+                //* Removes FIFO element from the queue
+                float curVal = leftHalf.Dequeue();
+
+                //* All() : Determines whether all elements of a sequence satisfy a condition.
+                if (lastComparedValue.All(x => curVal > x) && leftHalf.All(x => curVal >= x))
                 {
                     yield return Tuple.Create(_xValues[index], curVal);
                 }
 
-                before.Dequeue();
-                before.Enqueue(curVal);
-                after.Enqueue(d);
+                //* Removes first instance of Negative Infinity and eventually previous stored curVal
+                lastComparedValue.Dequeue();
+                //* Add the current analysed value
+                lastComparedValue.Enqueue(curVal);
+                //* 
+                leftHalf.Enqueue(d);
                 index++;
             }
         }
