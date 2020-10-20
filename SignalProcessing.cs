@@ -21,6 +21,13 @@ namespace CSVReader
         public List<Tuple<float, float>> ListOfMaximums => _listOfMaximums;
         public List<Tuple<float, float>> ListOfMinimus => _listOfMinimums;
 
+        //* Constructor
+        public SignalProcessing()
+        {
+            _listOfMaximums = new List<Tuple<float, float>>();
+            _listOfMinimums = new List<Tuple<float, float>>();
+        }
+
         public SignalProcessing(string path)
         {
             ReadCSV(path);
@@ -28,7 +35,7 @@ namespace CSVReader
             _listOfMinimums = new List<Tuple<float, float>>();
         }
 
-        //* Private methods
+        #region Private Methods
         private void ReadCSV(string path)
         {
             FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read);
@@ -53,8 +60,9 @@ namespace CSVReader
             file.Close();
         }
 
-        //* For how this method works:
+        //* Reference for this method works:
         //* https://stackoverflow.com/questions/5269000/finding-local-maxima-over-a-dynamic-range
+        //* Using the awnser from: https://stackoverflow.com/users/2805511/jeroen-cranendonk
         private IEnumerable<Tuple<float, float>> LocalMaxima(IEnumerable<float> source, int windowSize)
         {
             // Round up to nearest odd value
@@ -74,7 +82,6 @@ namespace CSVReader
                 //* Removes FIFO element from the queue
                 float curVal = leftHalf.Dequeue();
 
-                //* All() : Determines whether all elements of a sequence satisfy a condition.
                 // if (lastComparedValue.All(x => curVal > x) && leftHalf.All(x => curVal >= x))
                 // {
                 //     yield return Tuple.Create(_xValues[index], curVal);
@@ -95,6 +102,9 @@ namespace CSVReader
             }
         }
 
+        //* Reference for this method works:
+        //* https://stackoverflow.com/questions/5269000/finding-local-maxima-over-a-dynamic-range
+        //* Using the awnser from: https://stackoverflow.com/users/2805511/jeroen-cranendonk
         private IEnumerable<Tuple<float, float>> LocalMinima(IEnumerable<float> source, int windowSize)
         {
             // Round up to nearest odd value
@@ -102,20 +112,26 @@ namespace CSVReader
             int halfWindow = windowSize / 2;
 
             int index = 0;
-            Queue<float> before = new Queue<float>(Enumerable.Repeat(float.NegativeInfinity, halfWindow));
-            Queue<float> after = new Queue<float>(source.Take(halfWindow + 1));
+            Queue<float> lastComparedValue = new Queue<float>(Enumerable.Repeat(float.NegativeInfinity, halfWindow));
+            Queue<float> leftHalf = new Queue<float>(source.Take(halfWindow + 1));
 
             foreach (float d in source.Skip(halfWindow + 1).Concat(Enumerable.Repeat(float.NegativeInfinity, halfWindow + 1)))
             {
-                float curVal = after.Dequeue();
-                if (before.All(x => curVal < x) && after.All(x => curVal <= x))
+                float curVal = leftHalf.Dequeue();
+
+                // if (lastComparedValue.All(x => curVal < x) && after.All(xleftHalfurVal <= x))
+                // {
+                //     yield return Tuple.Create(_xValues[index], curVal);
+                // }
+
+                if (curVal < lastComparedValue.Min() && curVal <= leftHalf.Min())
                 {
                     yield return Tuple.Create(_xValues[index], curVal);
                 }
 
-                before.Dequeue();
-                before.Enqueue(curVal);
-                after.Enqueue(d);
+                lastComparedValue.Dequeue();
+                lastComparedValue.Enqueue(curVal);
+                leftHalf.Enqueue(d);
                 index++;
             }
         }
@@ -140,7 +156,9 @@ namespace CSVReader
             return new Tuple<float[], int[]>(BioValues.ToArray(), samples.ToArray());
         }
 
-        //* Public methods
+        #endregion
+
+        #region Public methods
         public void FindPeaks(int window)
         {
             _maximums = LocalMaxima(_yValues, window);
@@ -156,5 +174,7 @@ namespace CSVReader
                 _listOfMinimums.Add(minimum);
             }
         }
+
+        #endregion
     }
 }
