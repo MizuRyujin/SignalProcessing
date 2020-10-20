@@ -75,7 +75,12 @@ namespace CSVReader
                 float curVal = leftHalf.Dequeue();
 
                 //* All() : Determines whether all elements of a sequence satisfy a condition.
-                if (lastComparedValue.All(x => curVal > x) && leftHalf.All(x => curVal >= x))
+                // if (lastComparedValue.All(x => curVal > x) && leftHalf.All(x => curVal >= x))
+                // {
+                //     yield return Tuple.Create(_xValues[index], curVal);
+                // }
+
+                if (curVal > lastComparedValue.Max() && curVal >= leftHalf.Max())
                 {
                     yield return Tuple.Create(_xValues[index], curVal);
                 }
