@@ -136,24 +136,25 @@ namespace CSVReader
             }
         }
 
-        private Tuple<float[], int[]> MovingAverage(
-                    float[] xValue, int[] yValue, int dim, int k, int step = 1)
+        private Tuple<float[], float[]> MovingAverage(
+                    float[] xValue, float[] yValue, int dim, int k, int step = 1)
         {
 
             List<float> BioValues = new List<float>(xValue);
-            List<int> samples = new List<int>();
+            List<float> samples = new List<float>();
 
             for (int x = k; x < dim - k; x += step) //! It must change by n value
             {
-                // float ySum = 0;
-
-                for (int y = 0; y < yValue.Length; y++)
+                float ySum = 0;
+                for (int y = k; y < k + 1; y += step)
                 {
-
+                    ySum += yValue[x + y];
                 }
+                ySum = ySum / (2 * k);
+                samples.Add((float) Math.Round(ySum,3));
             }
 
-            return new Tuple<float[], int[]>(BioValues.ToArray(), samples.ToArray());
+            return new Tuple<float[], float[]>(BioValues.ToArray(), samples.ToArray());
         }
 
         #endregion

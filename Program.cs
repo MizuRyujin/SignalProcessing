@@ -6,21 +6,52 @@ namespace CSVReader
 {
     public class Program
     {
+        //* Need to give path to where source is located
         private static void Main(string[] args)
         {
-            string projectPath = @"D:\Miguel\Documents\Projetos\CSVReader\";
+            // string projectPath = @"D:\Miguel\Documents\Projetos\CSVReader\";
+            string projectPath;
+
+            if (args == null)
+            {
+                throw new Exception("No path given");
+            }
+            else
+            {
+                projectPath = args[0];
+            }
+
 
             string csvPath = string.Concat(projectPath, "scr.csv");
-            string resultPath;
-            string answer;
-            bool validInput = false;
-            int window;
 
-
-            SignalProcessing _signalProcesser = new SignalProcessing(csvPath);
+            SignalProcessing processor = new SignalProcessing(csvPath);
+            ProjectRunner runner = new ProjectRunner(projectPath);
 
             Console.WriteLine("There are {0} values to process",
-                                    _signalProcesser.XValues.Length);
+                                    processor.XValues.Length);
+
+            runner.TestPeaks(processor);
+        }
+    }
+}
+
+namespace CSVReader
+{
+    public class ProjectRunner
+    {
+        string projectPath;
+        string resultPath;
+        string answer;
+        bool validInput = false;
+        int window;
+
+        public ProjectRunner(string path)
+        {
+            projectPath = path;
+        }
+
+        public void TestPeaks(SignalProcessing processor)
+        {
             Console.Write("\nInput the search window: ");
 
             do
@@ -39,31 +70,39 @@ namespace CSVReader
             Console.WriteLine("Press a key to find peaks...");
             Console.ReadKey();
 
-            _signalProcesser.FindPeaks(window);
+            processor.FindPeaks(window);
 
+            Console.Clear();
             Console.WriteLine("There are {0} peaks, with a window range of {1}",
-                                _signalProcesser.ListOfMaximums.Count, window);
+                                processor.ListOfMaximums.Count, window);
 
-            Console.ReadKey();
-
-            foreach (Tuple<float, float> maximum in _signalProcesser.ListOfMaximums)
+            foreach (Tuple<float, float> maximum in processor.ListOfMaximums)
             {
                 System.Console.WriteLine(
                     "Peak {0} and position {1}", maximum.Item2, maximum.Item1);
             }
 
-            Console.WriteLine("There are {0} minimums, with a window range of 70",
-                                _signalProcesser.ListOfMinimus.Count);
+            Console.WriteLine("There are {0} minimums, with a window range of {1}",
+                                processor.ListOfMinimus.Count, window);
 
-            Console.ReadKey();
             Console.WriteLine();
 
-            foreach (Tuple<float, float> minimums in _signalProcesser.ListOfMinimus)
+            foreach (Tuple<float, float> minimums in processor.ListOfMinimus)
             {
                 Console.WriteLine("Minimum {0} and position {1}",
                                     minimums.Item2, minimums.Item1);
             }
 
+            SaveToCSV(processor);
+        }
+
+        public void TestMovingAverage(SignalProcessing processor)
+        {
+
+        }
+
+        public void SaveToCSV(SignalProcessing processor)
+        {
             validInput = false;
 
             Console.Write("\n Want to write values to CSV? ");
@@ -98,50 +137,23 @@ namespace CSVReader
                 using (StreamWriter file = new StreamWriter(fs))
                 {
                     file.WriteLine("# Maximum values");
-                    for (int i = 0; i < _signalProcesser.ListOfMaximums.Count; i++)
+                    for (int i = 0; i < processor.ListOfMaximums.Count; i++)
                     {
                         file.WriteLine("{0}\t{1}",
-                                        _signalProcesser.ListOfMaximums[i].Item1,
-                                        _signalProcesser.ListOfMaximums[i].Item2);
+                                        processor.ListOfMaximums[i].Item1,
+                                        processor.ListOfMaximums[i].Item2);
                     }
 
                     file.WriteLine("# Minimum values");
-                    for (int i = 0; i < _signalProcesser.ListOfMinimus.Count; i++)
+                    for (int i = 0; i < processor.ListOfMinimus.Count; i++)
                     {
                         file.WriteLine("{0}\t{1}",
-                                        _signalProcesser.ListOfMinimus[i].Item1,
-                                        _signalProcesser.ListOfMinimus[i].Item2);
+                                        processor.ListOfMinimus[i].Item1,
+                                        processor.ListOfMinimus[i].Item2);
                     }
                 }
                 fs.Close();
             }
-            // System.Random random = new Random();
-
-            // List<float> testValues = new List<float>();
-            // IEnumerable<Tuple<int, float>> maximums;
-            // List<Tuple<int, float>> listOfMaximums = new List<Tuple<int, float>>();
-
-            // for (int i = 0; i < 100; i++)
-            // {
-            //     float x = (float)random.NextDouble();
-            //     testValues.Add(x);
-            // }
-
-            // maximums = Test.LocalMaxima(testValues, 25);
-
-            // foreach(var tuple in maximums)
-            // {
-            //     listOfMaximums.Add(tuple);
-            // }
-
-            // Console.WriteLine();
-            // Console.WriteLine("Press any key to show list maximums...");
-            // Console.ReadKey();
-
-            // foreach (var item in listOfMaximums)
-            // {
-            //     System.Console.WriteLine(item);
-            // }
         }
     }
 }
