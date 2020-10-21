@@ -14,12 +14,14 @@ namespace CSVReader
         private IEnumerable<Tuple<float, float>> _minimums = default;
         private List<Tuple<float, float>> _listOfMaximums = default;
         private List<Tuple<float, float>> _listOfMinimums = default;
+        private Tuple<float[], float[]> _averageTuple = default;
 
         //* Properties
         public float[] XValues => _xValues;
         public float[] YValues => _yValues;
         public List<Tuple<float, float>> ListOfMaximums => _listOfMaximums;
         public List<Tuple<float, float>> ListOfMinimus => _listOfMinimums;
+        public Tuple<float[], float[]> AverageTuple => _averageTuple;
 
         //* Constructor
         public SignalProcessing()
@@ -137,24 +139,24 @@ namespace CSVReader
         }
 
         private Tuple<float[], float[]> MovingAverage(
-                    float[] xValue, float[] yValue, int dim, int k, int step = 1)
+                    float[] xValue, float[] yValue, int window, int step = 1)
         {
 
-            List<float> BioValues = new List<float>(xValue);
+            List<float> ticks = new List<float>(xValue);
             List<float> samples = new List<float>();
 
-            for (int x = k; x < dim - k; x += step) //! It must change by n value
+            for (int x = window; x < yValue.Length - window; x += step)
             {
                 float ySum = 0;
-                for (int y = k; y < k + 1; y += step)
+                for (int y = window; y <  window + 1; y += step)
                 {
                     ySum += yValue[x + y];
                 }
-                ySum = ySum / (2 * k);
-                samples.Add((float) Math.Round(ySum,3));
+                ySum = ySum / (2 * window);
+                samples.Add(MathF.Round(ySum, 4));
             }
 
-            return new Tuple<float[], float[]>(BioValues.ToArray(), samples.ToArray());
+            return new Tuple<float[], float[]>(ticks.ToArray(), samples.ToArray());
         }
 
         #endregion
@@ -174,6 +176,19 @@ namespace CSVReader
             {
                 _listOfMinimums.Add(minimum);
             }
+        }
+
+        public void GetMovingAverage(int window, int step = 1)
+        {
+            _averageTuple = MovingAverage(_xValues, _yValues, window, step);
+        }
+
+        public void EDAConversion(int value)
+        {
+            int n = 10;
+            float vcc = 3.3f;
+
+            float EDA = ((value / (MathF.Pow(2, n)) * vcc) / 0.132f);
         }
 
         #endregion
