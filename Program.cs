@@ -132,6 +132,26 @@ namespace CSVReader
                                         processor.ListOfMinimus[i].Item1,
                                         processor.ListOfMinimus[i].Item2);
                     }
+
+                    file.WriteLine("# Moving Average");
+                    string[] concatValues = new string[processor.AverageTuple.Item2.Length];
+                    for (int i = 0; i < processor.AverageTuple.Item2.Length; i++)
+                    {
+                        if (processor.AverageTuple?.Item1[i] == null) continue;
+
+                        concatValues[i] = processor.AverageTuple.Item1[i].ToString();
+                    }
+
+                    for (int i = 0; i < processor.AverageTuple.Item2.Length; i++)
+                    {
+                        if (processor.AverageTuple?.Item2[i] == null) continue;
+
+                        concatValues[i] = concatValues[i] + "\t" + processor.AverageTuple.Item2[i].ToString();
+                    }
+                    for (int i = 0; i < concatValues.Length; i++)
+                    {
+                        file.WriteLine(concatValues[i]);
+                    }
                 }
                 fs.Close();
             }
@@ -189,14 +209,14 @@ namespace CSVReader
             string[] concatValues = new string[processor.AverageTuple.Item2.Length];
             for (int i = 0; i < processor.AverageTuple.Item2.Length; i++)
             {
-                if (processor.AverageTuple.Item1[i] == null) continue;
+                if (processor.AverageTuple?.Item1[i] == null) continue;
 
                 concatValues[i] = processor.AverageTuple.Item1[i].ToString();
             }
 
             for (int i = 0; i < processor.AverageTuple.Item2.Length; i++)
             {
-                if (processor.AverageTuple.Item2[i] == null) continue;
+                if (processor.AverageTuple?.Item2[i] == null) continue;
 
                 concatValues[i] = concatValues[i] + ", " + processor.AverageTuple.Item2[i].ToString();
             }
@@ -205,6 +225,8 @@ namespace CSVReader
             {
                 System.Console.WriteLine(concatValues[i]);
             }
+
+            SaveToCSV(processor);
         }
     }
 }
