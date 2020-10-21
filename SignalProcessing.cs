@@ -14,14 +14,14 @@ namespace CSVReader
         private IEnumerable<Tuple<float, float>> _minimums = default;
         private List<Tuple<float, float>> _listOfMaximums = default;
         private List<Tuple<float, float>> _listOfMinimums = default;
-        private Tuple<float[], float[]> _averageTuple = default;
+        private List<float> _averages = default;
 
         //* Properties
         public float[] XValues => _xValues;
         public float[] YValues => _yValues;
         public List<Tuple<float, float>> ListOfMaximums => _listOfMaximums;
         public List<Tuple<float, float>> ListOfMinimus => _listOfMinimums;
-        public Tuple<float[], float[]> AverageTuple => _averageTuple;
+        public List<float> Averages => _averages;
 
         //* Constructor
         public SignalProcessing()
@@ -84,11 +84,6 @@ namespace CSVReader
                 //* Removes FIFO element from the queue
                 float curVal = leftHalf.Dequeue();
 
-                // if (lastComparedValue.All(x => curVal > x) && leftHalf.All(x => curVal >= x))
-                // {
-                //     yield return Tuple.Create(_xValues[index], curVal);
-                // }
-
                 if (curVal > lastComparedValue.Max() && curVal >= leftHalf.Max())
                 {
                     yield return Tuple.Create(_xValues[index], curVal);
@@ -122,11 +117,6 @@ namespace CSVReader
             {
                 float curVal = leftHalf.Dequeue();
 
-                // if (lastComparedValue.All(x => curVal < x) && after.All(xleftHalfurVal <= x))
-                // {
-                //     yield return Tuple.Create(_xValues[index], curVal);
-                // }
-
                 if (curVal < lastComparedValue.Min() && curVal <= leftHalf.Min())
                 {
                     yield return Tuple.Create(_xValues[index], curVal);
@@ -139,25 +129,34 @@ namespace CSVReader
             }
         }
 
-        private Tuple<float[], float[]> MovingAverage(
-                    float[] xValue, float[] yValue, int window, int step = 1)
+        private List<float> MovingAverage(
+            float[] yValue, int window, int step = 1)
         {
+            float[] before = new float[window];
+            before = Enumerable.Repeat(
+                        yValue.First(), before.Length).ToArray();
 
-            List<float> ticks = new List<float>(xValue);
-            List<float> samples = new List<float>();
+            float[] after = new float[window];
+            after = Enumerable.Repeat(
+                        yValue.Last(), after.Length).ToArray();
 
-            for (int x = window; x < yValue.Length - window; x += step)
+            float[] concatArray = new float[before.Length + yValue.Length + after.Length];
+            concatArray = Enumerable.Concat(before, yValue).Concat(after).ToArray();
+
+            List<float> movAverage = new List<float>();
+
+            for (int i = window; i < yValue.Length + window; i += step)
             {
-                float ySum = 0;
-                for (int y = window; y <  window + 1; y += step)
+                float ySum = 0f;
+                for (int j = -window; j < window; j++)
                 {
-                    ySum += yValue[x + y];
+                    ySum += concatArray[i + j];
                 }
                 ySum = ySum / (2 * window);
-                samples.Add(MathF.Round(ySum, 4));
+                movAverage.Add(MathF.Round(ySum, 4));
             }
 
-            return new Tuple<float[], float[]>(ticks.ToArray(), samples.ToArray());
+            return movAverage;
         }
 
         #endregion
@@ -181,7 +180,7 @@ namespace CSVReader
 
         public void GetMovingAverage(int window, int step = 1)
         {
-            _averageTuple = MovingAverage(_xValues, _yValues, window, step);
+            _averages = MovingAverage(_yValues, window, step);
         }
 
         public void EDAConversion(int value)

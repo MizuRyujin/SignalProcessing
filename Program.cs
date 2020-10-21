@@ -134,23 +134,9 @@ namespace CSVReader
                     }
 
                     file.WriteLine("# Moving Average");
-                    string[] concatValues = new string[processor.AverageTuple.Item2.Length];
-                    for (int i = 0; i < processor.AverageTuple.Item2.Length; i++)
+                    for (int i = 0; i < processor.Averages.Count; i++)
                     {
-                        if (processor.AverageTuple?.Item1[i] == null) continue;
-
-                        concatValues[i] = processor.AverageTuple.Item1[i].ToString();
-                    }
-
-                    for (int i = 0; i < processor.AverageTuple.Item2.Length; i++)
-                    {
-                        if (processor.AverageTuple?.Item2[i] == null) continue;
-
-                        concatValues[i] = concatValues[i] + "\t" + processor.AverageTuple.Item2[i].ToString();
-                    }
-                    for (int i = 0; i < concatValues.Length; i++)
-                    {
-                        file.WriteLine(concatValues[i]);
+                        file.WriteLine(processor.Averages[i]);
                     }
                 }
                 fs.Close();
@@ -206,24 +192,11 @@ namespace CSVReader
             processor.GetMovingAverage(_window);
 
             System.Console.WriteLine("The values are...");
-            string[] concatValues = new string[processor.AverageTuple.Item2.Length];
-            for (int i = 0; i < processor.AverageTuple.Item2.Length; i++)
+
+
+            for (int i = 0; i < processor.Averages.Count; i++)
             {
-                if (processor.AverageTuple?.Item1[i] == null) continue;
-
-                concatValues[i] = processor.AverageTuple.Item1[i].ToString();
-            }
-
-            for (int i = 0; i < processor.AverageTuple.Item2.Length; i++)
-            {
-                if (processor.AverageTuple?.Item2[i] == null) continue;
-
-                concatValues[i] = concatValues[i] + ", " + processor.AverageTuple.Item2[i].ToString();
-            }
-
-            for (int i = 0; i < concatValues.Length; i++)
-            {
-                System.Console.WriteLine(concatValues[i]);
+                System.Console.WriteLine(processor.Averages[i]);
             }
 
             SaveToCSV(processor);
