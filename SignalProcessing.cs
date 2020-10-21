@@ -117,6 +117,7 @@ namespace CSVReader
             Queue<float> lastComparedValue = new Queue<float>(Enumerable.Repeat(float.NegativeInfinity, halfWindow));
             Queue<float> leftHalf = new Queue<float>(source.Take(halfWindow + 1));
 
+            //* Save the collection before using it
             foreach (float d in source.Skip(halfWindow + 1).Concat(Enumerable.Repeat(float.NegativeInfinity, halfWindow + 1)))
             {
                 float curVal = leftHalf.Dequeue();
